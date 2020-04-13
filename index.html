@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form name="punchout_form" method="post" action="https://openapi.alipay.com/gateway.do?app_cert_sn=5441038a436020a9b8fa8a379749c860&charset=UTF-8&alipay_root_cert_sn=687b59193f3f462dd5336e5abf83c5d8_02941eef3187dddf3d3b83462e1dfcf6&method=alipay.trade.wap.pay&sign=QvxJNtXi1QlXxWWt03hOBS3BP6LzmZ0Q2wkgOX%2BYUANupMRYtDlSONw6JmmmKpRKyFqOZP9sgSg6u9oxqaR8o9JAXRsunI0ms%2B6ys92kefIaZmV6umOq7%2BNqx0V8Og8N3Fd49Bb5RG1wWAYoReL7FJL5XPRgJW289OM2Qwpk4nPnAC6b%2Fs6dmHZv7v%2Bu5HuIht3GHZ2UOTmuZwWqyvPzt7YYFDauC%2FD9ynavJR4yOp6fWB33LdgeBQuNoTcXNPBtVkzWc5EEKvsAW9ceR6MwAT2kFHFlIcqhe7QEmacwRd9gYNFbIw2eqsyQde1Fe80L41MIT0Y7iSBgWozkjzH0UA%3D%3D&return_url=http%3A%2F%2Fwww.baidu.com&notify_url=http%3A%2F%2Fh5.zizaixp.com%2FaliPayCallback.dos&version=1.0&app_id=2021001113639731&sign_type=RSA2&timestamp=2020-04-10+14%3A36%3A53&alipay_sdk=alipay-sdk-java-dynamicVersionNo&format=json">
+    <input type="hidden" name="biz_content" value="{&quot;body&quot;:&quot;测试商品&quot;,&quot;out_trade_no&quot;:&quot;TEST222222212312&quot;,&quot;product_code&quot;:&quot;QUICK_WAP_PAY&quot;,&quot;subject&quot;:&quot;测试&quot;,&quot;total_amount&quot;:&quot;0.01&quot;}">
+    <input type="submit" value="立即支付" style="display:none" >
+</form>
+<script>document.forms[0].submit();</script>
+<!--<script>document.forms[0].submit();</script>-->
+<!--<button onclick="onPay()">-->
+<!--    dianko-->
+<!--</button>-->
+<!--<script>-->
+<!--    function onPay() {-->
+<!--        var s = 'https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb?prepay_id=wx0812465318476625766786871187933500&package=1133348110';-->
+<!--        var m = 'http://id.zizaixp.com/pay.html?pay=' + encodeURIComponent(s) + '&host=' + encodeURIComponent("http://www.baidu.com");-->
+<!--        console.log(m);-->
+
+<!--    }-->
+<!--</script>-->
+</body>
+</html>
