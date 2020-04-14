@@ -2,8 +2,14 @@ package com.xxscloud.gpay;
 
 import com.xxscloud.gpay.data.OrderInfo;
 import com.xxscloud.gpay.data.PayChannelEnum;
+import com.xxscloud.gpay.data.PayStatusEnum;
+import com.xxscloud.gpay.gson.JsonObject;
+import com.xxscloud.gpay.wxpay.WeChatPayClient;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 /**
@@ -31,10 +37,10 @@ public final class Signature {
             if (!pay.checkSignature(header, body)) {
                 throw new PayIOException("签名错误");
             }
-            callback.run(parse(body));
+            callback.run(parse(channel, body));
             return response(channel, true);
         } catch (PayIOException ex) {
-            log.info("签名校验异常: " + ex);
+            log.info("回执签名校验执行异常: " + ex);
             return response(channel, false);
         }
     }
@@ -55,16 +61,50 @@ public final class Signature {
         return callbackCheck(channel, obj, body, null, callback);
     }
 
-    private static OrderInfo parse(String body) {
-        return new OrderInfo();
+    @SneakyThrows
+    private static OrderInfo parse(PayChannelEnum channel, String body) {
+        final OrderInfo orderInfo;
+        switch (channel) {
+            case ALI_PAY:
+                final JsonObject aliPayObject = new JsonObject(body);
+                orderInfo = new OrderInfo();
+                orderInfo.setFlowNo(aliPayObject.getString("out_trade_no"));
+                orderInfo.setTransactionNo(aliPayObject.getString("trade_no"));
+                orderInfo.setOpenId(aliPayObject.getString("buyer_id"));
+                orderInfo.setTransactionType("");
+                orderInfo.setStatus(PayStatusEnum.parse(aliPayObject.getString("trade_status")));
+                orderInfo.setBankType("");
+                orderInfo.setAmount(aliPayObject.getBigDecimal("total_amount"));
+                orderInfo.setPayTime(aliPayObject.getDate("gmt_payment"));
+                orderInfo.setCurrency("");
+                orderInfo.setAttach(aliPayObject.getString("passback_params"));
+                return orderInfo;
+            case WE_CHAT_PAY:
+                final JsonObject weChatObject = WeChatPayClient.toBean(body);
+                orderInfo = new OrderInfo();
+                orderInfo.setFlowNo(weChatObject.getString("out_trade_no"));
+                orderInfo.setTransactionNo(weChatObject.getString("transaction_id"));
+                orderInfo.setOpenId(weChatObject.getString("openid"));
+                orderInfo.setTransactionType(weChatObject.getString("trade_type"));
+                orderInfo.setStatus(PayStatusEnum.parse(weChatObject.getString("result_code")));
+                orderInfo.setBankType("");
+                orderInfo.setAmount(weChatObject.getBigDecimal("total_fee").divide(BigDecimal.valueOf(100), 2, BigDecimal.ROUND_DOWN));
+                final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                orderInfo.setPayTime(simpleDateFormat.parse(weChatObject.getString("time_end")));
+                orderInfo.setCurrency("");
+                orderInfo.setAttach(weChatObject.getString("attach"));
+                return orderInfo;
+            default:
+                return new OrderInfo();
+        }
     }
 
     private static String response(PayChannelEnum channel, boolean flag) {
         switch (channel) {
             case ALI_PAY:
                 return flag
-                        ? "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>"
-                        : "";
+                        ? "success"
+                        : "error";
             case WE_CHAT_PAY:
                 return flag
                         ? "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>"

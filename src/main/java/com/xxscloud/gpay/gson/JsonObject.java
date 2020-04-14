@@ -1,10 +1,7 @@
 package com.xxscloud.gpay.gson;
 
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -127,17 +124,29 @@ public final class JsonObject extends HashMap<String, Object> {
         return JsonUtils.stringify(this);
     }
 
+
     public JsonArray getJsonArray(String memberName) {
-        return new JsonArray(this.getElement(memberName).getAsJsonArray());
+        final JsonElement element = this.getElement(memberName);
+        if (element == null) {
+            return null;
+        }
+        return new JsonArray(element.getAsJsonArray());
     }
 
     public JsonObject getJsonObject(String memberName) {
-        return new JsonObject(this.getElement(memberName).getAsJsonObject());
+        final JsonElement element = this.getElement(memberName);
+        if (element == null) {
+            return null;
+        }
+        return new JsonObject(element.getAsJsonObject());
     }
 
 
     public JsonElement getElement(Object key) {
         final Object obj = super.get(key);
+        if (obj == null) {
+            return null;
+        }
         if (obj instanceof JsonElement) {
             return (JsonElement) obj;
         }
@@ -157,55 +166,107 @@ public final class JsonObject extends HashMap<String, Object> {
     }
 
     public Number getNumber(String i) {
-        return this.getElement(i).getAsNumber();
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            return null;
+        }
+        return element.getAsNumber();
     }
 
     public String getString(String i) {
-        return this.getElement(i).getAsString();
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            return null;
+        }
+        return element.getAsString();
     }
 
-    public double getDouble(String i) {
-        return this.getElement(i).getAsDouble();
+    public Double getDouble(String i) {
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            return null;
+        }
+        return element.getAsDouble();
     }
 
     public BigDecimal getBigDecimal(String i) {
-        return this.getElement(i).getAsBigDecimal();
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            return null;
+        }
+        return element.getAsBigDecimal();
     }
 
     public BigInteger getBigInteger(String i) {
-        return this.getElement(i).getAsBigInteger();
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            return null;
+        }
+        return element.getAsBigInteger();
     }
 
-    public float getFloat(String i) {
-        return this.getElement(i).getAsFloat();
+    public Float getFloat(String i) {
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            throw new NullPointerException();
+        }
+        return element.getAsFloat();
     }
 
-    public long getLong(String i) {
-        return this.getElement(i).getAsLong();
+    public Long getLong(String i) {
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            return null;
+        }
+        return element.getAsLong();
     }
 
-    public int getInteger(String i) {
-        return this.getElement(i).getAsInt();
+    public Integer getInteger(String i) {
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            return null;
+        }
+        return element.getAsInt();
     }
 
     public byte getByte(String i) {
-        return this.getElement(i).getAsByte();
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            throw new NullPointerException();
+        }
+        return element.getAsByte();
     }
 
     public char getCharacter(String i) {
-        return this.getElement(i).getAsCharacter();
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            throw new NullPointerException();
+        }
+        return element.getAsCharacter();
     }
 
     public short getShort(String i) {
-        return this.getElement(i).getAsShort();
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            throw new NullPointerException();
+        }
+        return element.getAsShort();
     }
 
-    public boolean getBoolean(String i) {
-        return this.getElement(i).getAsBoolean();
+    public Boolean getBoolean(String i) {
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            return null;
+        }
+        return element.getAsBoolean();
     }
 
     public Date getDate(String i) {
-        final String content = this.getElement(i).getAsString();
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            return null;
+        }
+        final String content = element.getAsString();
         //is Number
         if (Z.matcher(content).matches()) {
             return new Date(Long.parseLong(content));
@@ -226,7 +287,11 @@ public final class JsonObject extends HashMap<String, Object> {
 
     public Date getDate(String i, String format) {
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-        final String content = this.getElement(i).getAsString();
+        final JsonElement element = this.getElement(i);
+        if (element == null) {
+            return null;
+        }
+        final String content = element.getAsString();
         try {
             return simpleDateFormat.parse(content);
         } catch (ParseException e) {

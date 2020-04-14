@@ -7,13 +7,13 @@ import com.alipay.api.domain.*;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.*;
 import com.alipay.api.response.*;
-import com.gpay.pay.*;
-import com.gpay.pay.data.*;
+import com.xxscloud.gpay.GPayFactory;
 import com.xxscloud.gpay.IPay;
 import com.xxscloud.gpay.PayException;
 import com.xxscloud.gpay.PayIOException;
 import com.xxscloud.gpay.data.*;
 import com.xxscloud.gpay.gson.JsonObject;
+import com.xxscloud.gpay.gson.JsonUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,11 +28,14 @@ import java.util.TreeMap;
 public class AliPay implements IPay {
     private final DefaultAlipayClient alipayClient;
     private final CertAlipayRequest certAlipayRequest;
+    private final GPayFactory.PayLogCallback payLogCallback;
 
     @SneakyThrows
-    public AliPay(Object obj) {
+    public AliPay(Object obj, GPayFactory.PayLogCallback callback) {
         certAlipayRequest = (CertAlipayRequest) obj;
         alipayClient = new DefaultAlipayClient(certAlipayRequest);
+        payLogCallback = callback == null ? (_1, _2, _3, _4) -> {
+        } : callback;
     }
 
     @Override
@@ -40,7 +43,22 @@ public class AliPay implements IPay {
                         String requestUrl, String notifyUrl, String attachArgs) {
 
         if (flowNo == null || flowNo.length() <= 0) {
-            throw new PayException("订单号异常");
+            throw new PayException("流水号异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (subject == null || subject.length() <= 0) {
+            throw new PayException("支付信息头异常");
+        }
+        if (body == null || body.length() <= 0) {
+            throw new PayException("支付信息正文异常");
+        }
+        if (notifyUrl == null || notifyUrl.length() <= 0) {
+            throw new PayException("通知地址异常");
+        }
+        if (requestUrl == null || requestUrl.length() <= 0) {
+            throw new PayException("请求地址异常");
         }
 
         final AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
@@ -58,14 +76,16 @@ public class AliPay implements IPay {
         }
         request.setReturnUrl(requestUrl);
         request.setBizModel(wap);
-
         try {
+            payLogCallback.run("h5Pay", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
             final AlipayTradeWapPayResponse response = alipayClient.pageExecute(request);
+            payLogCallback.run("h5Pay", flowNo, LogTypeEnum.RESPONSE, response.getBody());
             if (!response.isSuccess()) {
                 throw new PayIOException(response.getMsg());
             }
             return response.getBody();
         } catch (AlipayApiException e) {
+            payLogCallback.run("h5Pay", flowNo, LogTypeEnum.ERROR, e.getMessage());
             throw new PayException(e);
         }
     }
@@ -74,6 +94,24 @@ public class AliPay implements IPay {
     public String pcPay(String ip, String flowNo, BigDecimal amount, String subject, String body,
                         String requestUrl, String notifyUrl, String attachArgs) {
 
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (subject == null || subject.length() <= 0) {
+            throw new PayException("支付信息头异常");
+        }
+        if (body == null || body.length() <= 0) {
+            throw new PayException("支付信息正文异常");
+        }
+        if (notifyUrl == null || notifyUrl.length() <= 0) {
+            throw new PayException("通知地址异常");
+        }
+        if (requestUrl == null || requestUrl.length() <= 0) {
+            throw new PayException("请求地址异常");
+        }
 
         final AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
         final AlipayTradePagePayModel page = new AlipayTradePagePayModel();
@@ -88,12 +126,15 @@ public class AliPay implements IPay {
         request.setBizModel(page);
 
         try {
+            payLogCallback.run("pcPay", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
             final AlipayTradePagePayResponse response = alipayClient.pageExecute(request);
+            payLogCallback.run("pcPay", flowNo, LogTypeEnum.RESPONSE, response.getBody());
             if (!response.isSuccess()) {
                 throw new PayIOException(response.getMsg());
             }
             return response.getBody();
         } catch (AlipayApiException e) {
+            payLogCallback.run("pcPay", flowNo, LogTypeEnum.ERROR, e.getMessage());
             throw new PayException(e);
         }
     }
@@ -101,6 +142,22 @@ public class AliPay implements IPay {
     @Override
     public String appPay(String ip, String flowNo, BigDecimal amount, String subject, String body,
                          String notifyUrl, String attachArgs) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (subject == null || subject.length() <= 0) {
+            throw new PayException("支付信息头异常");
+        }
+        if (body == null || body.length() <= 0) {
+            throw new PayException("支付信息正文异常");
+        }
+        if (notifyUrl == null || notifyUrl.length() <= 0) {
+            throw new PayException("通知地址异常");
+        }
+
 
         final AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
         final AlipayTradeAppPayModel app = new AlipayTradeAppPayModel();
@@ -114,12 +171,15 @@ public class AliPay implements IPay {
         request.setNotifyUrl(notifyUrl);
 
         try {
+            payLogCallback.run("appPay", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(request));
             final AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
+            payLogCallback.run("appPay", flowNo, LogTypeEnum.RESPONSE, response.getBody());
             if (!response.isSuccess()) {
                 throw new PayIOException(response.getMsg());
             }
             return response.getBody();
         } catch (AlipayApiException e) {
+            payLogCallback.run("appPay", flowNo, LogTypeEnum.ERROR, e.getMessage());
             throw new PayException(e);
         }
     }
@@ -143,12 +203,17 @@ public class AliPay implements IPay {
 
     @Override
     public OrderInfo queryOrder(String flowNo) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
         final AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
         final AlipayTradeQueryModel query = new AlipayTradeQueryModel();
         query.setOutTradeNo(flowNo);
         request.setBizModel(query);
         try {
+            payLogCallback.run("queryOrder", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
             final AlipayTradeQueryResponse response = alipayClient.certificateExecute(request);
+            payLogCallback.run("queryOrder", flowNo, LogTypeEnum.RESPONSE, response.getBody());
             if (!response.isSuccess()) {
                 throw new PayIOException(response.getMsg());
             }
@@ -172,12 +237,19 @@ public class AliPay implements IPay {
             orderInfo.setAttach("");
             return orderInfo;
         } catch (AlipayApiException e) {
+            payLogCallback.run("queryOrder", flowNo, LogTypeEnum.ERROR, e.getMessage());
             throw new PayException(e);
         }
     }
 
     @Override
     public RefundOrderInfo queryRefundOrderInfo(String flowNo, String refundNo, int offset) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (refundNo == null || refundNo.length() <= 0) {
+            throw new PayException("退款流水号异常");
+        }
         final AlipayTradeFastpayRefundQueryRequest request = new AlipayTradeFastpayRefundQueryRequest();
         final AlipayTradeFastpayRefundQueryModel refund = new AlipayTradeFastpayRefundQueryModel();
         refund.setOutRequestNo(refundNo);
@@ -185,7 +257,9 @@ public class AliPay implements IPay {
         request.setBizModel(refund);
 
         try {
+            payLogCallback.run("queryRefundOrderInfo", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
             final AlipayTradeFastpayRefundQueryResponse response = alipayClient.certificateExecute(request);
+            payLogCallback.run("queryRefundOrderInfo", flowNo, LogTypeEnum.RESPONSE, response.getBody());
             if (!response.isSuccess()) {
                 throw new PayIOException(response.getSubCode() + ":" + response.getSubMsg());
             }
@@ -200,6 +274,7 @@ public class AliPay implements IPay {
             refundOrderInfo.setRemark("如果支付宝返回部分需要开通权限支付宝才会返回");
             return refundOrderInfo;
         } catch (AlipayApiException e) {
+            payLogCallback.run("queryRefundOrderInfo", flowNo, LogTypeEnum.ERROR, e.getMessage());
             throw new PayException(e);
         }
     }
@@ -207,23 +282,47 @@ public class AliPay implements IPay {
 
     @Override
     public boolean closeOrder(String flowNo) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+
         final AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
         final AlipayTradeCloseModel transaction = new AlipayTradeCloseModel();
         transaction.setOutTradeNo(flowNo);
         request.setBizModel(transaction);
         try {
+            payLogCallback.run("closeOrder", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
             final AlipayTradeCloseResponse response = alipayClient.execute(request);
+            payLogCallback.run("closeOrder", flowNo, LogTypeEnum.RESPONSE, response.getBody());
+
             if (!response.isSuccess()) {
                 throw new PayIOException(response.getSubCode() + ":" + response.getSubMsg());
             }
             return true;
         } catch (AlipayApiException e) {
+            payLogCallback.run("closeOrder", flowNo, LogTypeEnum.ERROR, e.getMessage());
             throw new PayException(e);
         }
     }
 
     @Override
     public boolean refundOrder(String flowNo, String refundNo, BigDecimal orderAmount, BigDecimal refundAmount, String refundReason) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (refundNo == null || refundNo.length() <= 0) {
+            throw new PayException("退款流水号异常");
+        }
+        if (orderAmount == null || orderAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("订单金额异常");
+        }
+        if (refundAmount == null || refundAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("退款金额异常");
+        }
+        if (refundReason == null || refundReason.length() <= 0) {
+            throw new PayException("退款原因异常");
+        }
+
         final AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
         final AlipayTradeRefundModel transaction = new AlipayTradeRefundModel();
         transaction.setOutTradeNo(refundNo);
@@ -232,20 +331,36 @@ public class AliPay implements IPay {
 
         request.setBizModel(transaction);
         try {
+            payLogCallback.run("refundOrder", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
             final AlipayTradeRefundResponse response = alipayClient.execute(request);
+            payLogCallback.run("refundOrder", flowNo, LogTypeEnum.RESPONSE, response.getBody());
+
             if (!response.isSuccess()) {
                 throw new PayIOException(response.getSubCode() + ":" + response.getSubMsg());
             }
             return true;
         } catch (AlipayApiException e) {
+            payLogCallback.run("refundOrder", flowNo, LogTypeEnum.ERROR, e.getMessage());
             throw new PayException(e);
         }
     }
 
     @Override
     public boolean transfer(String flowNo, BigDecimal amount, String payeeId, String realName, String attachArgs) {
-        final AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (payeeId == null || payeeId.length() <= 0) {
+            throw new PayException("收款人信息异常");
+        }
+        if (realName == null || realName.length() <= 0) {
+            throw new PayException("真实姓名信息异常");
+        }
 
+        final AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
         final AlipayFundTransUniTransferModel transfer = new AlipayFundTransUniTransferModel();
         transfer.setOutBizNo(flowNo);
         transfer.setTransAmount(amount.setScale(2, BigDecimal.ROUND_DOWN).toString());
@@ -259,18 +374,37 @@ public class AliPay implements IPay {
         transfer.setRemark(attachArgs);
         request.setBizModel(transfer);
         try {
+            payLogCallback.run("transfer", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
             final AlipayFundTransUniTransferResponse response = alipayClient.certificateExecute(request);
+            payLogCallback.run("transfer", flowNo, LogTypeEnum.RESPONSE, response.getBody());
+
             if (!response.isSuccess()) {
                 throw new PayIOException(response.getSubCode() + ":" + response.getSubMsg());
             }
             return true;
         } catch (AlipayApiException e) {
+            payLogCallback.run("transfer", flowNo, LogTypeEnum.ERROR, e.getMessage());
             throw new PayException(e);
         }
     }
 
     @Override
     public boolean transferBankCard(String flowNo, BigDecimal amount, String bankCardNo, String realName, String bankCode, String attachArgs) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (bankCardNo == null || bankCardNo.length() <= 0) {
+            throw new PayException("卡号信息异常");
+        }
+        if (bankCode == null || bankCode.length() <= 0) {
+            throw new PayException("银行代码信息异常");
+        }
+        if (realName == null || realName.length() <= 0) {
+            throw new PayException("真实姓名信息异常");
+        }
         final AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
         final AlipayFundTransUniTransferModel transfer = new AlipayFundTransUniTransferModel();
         transfer.setOutBizNo(flowNo);
@@ -285,24 +419,34 @@ public class AliPay implements IPay {
         transfer.setRemark(attachArgs);
         request.setBizModel(transfer);
         try {
+            payLogCallback.run("transferBankCard", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
             final AlipayFundTransUniTransferResponse response = alipayClient.certificateExecute(request);
+            payLogCallback.run("transferBankCard", flowNo, LogTypeEnum.RESPONSE, response.getBody());
+
             if (!response.isSuccess()) {
                 throw new PayIOException(response.getSubCode() + ":" + response.getSubMsg());
             }
             return true;
         } catch (AlipayApiException e) {
+            payLogCallback.run("transferBankCard", flowNo, LogTypeEnum.ERROR, e.getMessage());
             throw new PayException(e);
         }
     }
 
     @Override
     public TransferInfo queryTransferInfo(String flowNo) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
         final AlipayFundTransOrderQueryRequest request = new AlipayFundTransOrderQueryRequest();
         final AlipayFundTransOrderQueryModel trans = new AlipayFundTransOrderQueryModel();
         trans.setOutBizNo(flowNo);
         request.setBizModel(trans);
         try {
+            payLogCallback.run("queryTransferInfo", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
             final AlipayFundTransOrderQueryResponse response = alipayClient.certificateExecute(request);
+            payLogCallback.run("queryTransferInfo", flowNo, LogTypeEnum.RESPONSE, response.getBody());
+
             if (!response.isSuccess()) {
                 throw new PayIOException(response.getSubCode() + ":" + response.getSubMsg());
             }
@@ -320,6 +464,7 @@ public class AliPay implements IPay {
             transferInfo.setAttach("");
             return transferInfo;
         } catch (AlipayApiException | ParseException e) {
+            payLogCallback.run("queryTransferInfo", flowNo, LogTypeEnum.ERROR, e.getMessage());
             throw new PayException(e);
         }
     }

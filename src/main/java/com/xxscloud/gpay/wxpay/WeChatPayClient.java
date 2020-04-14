@@ -2,7 +2,9 @@ package com.xxscloud.gpay.wxpay;
 
 
 import com.xxscloud.gpay.PayIOException;
+import com.xxscloud.gpay.data.LogTypeEnum;
 import com.xxscloud.gpay.gson.JsonObject;
+import com.xxscloud.gpay.gson.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
@@ -62,22 +64,50 @@ public class WeChatPayClient {
         }
     }
 
+    /**
+     * 获取AppId.
+     *
+     * @return APPId.
+     */
     public String getAppId() {
         return appId;
     }
 
+    /**
+     * 获取商户号.
+     *
+     * @return 商户号.
+     */
     public String getMerchantId() {
         return merchantId;
     }
 
+    /**
+     * 获取秘钥.
+     *
+     * @return 秘钥.
+     */
     public String getKey() {
         return key;
     }
 
+    /**
+     * 获取证书.
+     *
+     * @return 证书bye[].
+     */
     public byte[] getCertificate() {
         return certificate;
     }
 
+    /**
+     * 发送请求.
+     *
+     * @param url     请求地址.
+     * @param request 请求参数.
+     * @param <T>     返回结果类型.
+     * @return 数据.
+     */
     public <T extends IWxResponse> T execute(String url, IWxRequest request) {
         request.setSign(DigestUtils.md5Hex(request.toString() + "&key=" + this.key).toUpperCase());
         final HttpPost httpPost = new HttpPost(url);
@@ -106,11 +136,23 @@ public class WeChatPayClient {
         }
     }
 
+    /**
+     * 用与本地执行.
+     *
+     * @param request 请求参数.
+     * @return 返回结果.
+     */
     public Object sdkExecute(IWxRequest request) {
         request.setSign(DigestUtils.md5Hex(request.toString() + "&key=" + this.key).toUpperCase());
         return request;
     }
 
+    /**
+     * 转XML.
+     *
+     * @param request 请求实体.
+     * @return 返回结果.
+     */
     private String toXml(IWxRequest request) {
         final StringBuilder xml = new StringBuilder("<xml>\n");
         request.toMap().forEach((k, v) -> {
@@ -123,6 +165,14 @@ public class WeChatPayClient {
         return xml.toString();
     }
 
+    /**
+     * 转toBean
+     *
+     * @param xml   XML 内容.
+     * @param clazz 类对象.
+     * @param <T>   模板.
+     * @return 返回模板数据.
+     */
     private <T> IWxResponse toBean(String xml, Class<T> clazz) {
         try {
             final Document document = DocumentHelper.parseText(xml);
@@ -152,8 +202,13 @@ public class WeChatPayClient {
         }
     }
 
-
-    JsonObject toBean(String xml) {
+    /**
+     * 转JsonObject
+     *
+     * @param xml XML 内容.
+     * @return JsonObject 动态类型.
+     */
+    public static JsonObject toBean(String xml) {
         try {
             final Document document = DocumentHelper.parseText(xml);
             final Element root = document.getRootElement();

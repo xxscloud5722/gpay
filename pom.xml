@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.xxscloud.gpay</groupId>
+    <groupId>com.xxscloud5722.gpay</groupId>
     <artifactId>gpay</artifactId>
     <version>1.0</version>
     <properties>
@@ -92,5 +92,26 @@
 <!--        </dependency>-->
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>rdc-releases</id>
+            <url>https://repo.rdc.aliyun.com/repository/73562-release-lmXjO7/</url>
+        </repository>
+        <repository>
+            <id>rdc-snapshots</id>
+            <url>https://repo.rdc.aliyun.com/repository/73562-snapshot-Ml4niL/</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>rdc-releases</id>
+            <url>https://repo.rdc.aliyun.com/repository/73562-release-lmXjO7/</url>
+        </repository>
+        <snapshotRepository>
+            <id>rdc-snapshots</id>
+            <url>https://repo.rdc.aliyun.com/repository/73562-snapshot-Ml4niL/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>

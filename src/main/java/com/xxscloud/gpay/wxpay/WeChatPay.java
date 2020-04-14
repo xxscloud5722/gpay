@@ -1,14 +1,12 @@
 package com.xxscloud.gpay.wxpay;
 
+import com.xxscloud.gpay.GPayFactory;
 import com.xxscloud.gpay.IPay;
 import com.xxscloud.gpay.PayException;
 import com.xxscloud.gpay.PayIOException;
-import com.gpay.pay.data.*;
 import com.xxscloud.gpay.data.*;
 import com.xxscloud.gpay.gson.JsonObject;
 import com.xxscloud.gpay.gson.JsonUtils;
-import com.gpay.pay.wxpay.request.*;
-import com.gpay.pay.wxpay.response.*;
 import com.xxscloud.gpay.wxpay.request.*;
 import com.xxscloud.gpay.wxpay.response.*;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +33,12 @@ public class WeChatPay implements IPay {
 
     private static final String TRANSFERS = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
     private static final String QUERY_TRANSFERS = "https://api.mch.weixin.qq.com/pay/refundquery";
+    private final GPayFactory.PayLogCallback payLogCallback;
 
 
-    public WeChatPay(Object obj) {
+    public WeChatPay(Object obj, GPayFactory.PayLogCallback callback) {
+        payLogCallback = callback == null ? (_1, _2, _3, _4) -> {
+        } : callback;
         weChatPayClient = (WeChatPayClient) obj;
     }
 
@@ -50,6 +51,28 @@ public class WeChatPay implements IPay {
 
     @Override
     public String h5Pay(String ip, String flowNo, BigDecimal amount, String subject, String body, String requestUrl, String notifyUrl, String attachArgs) {
+        if (ip == null || ip.length() <= 0) {
+            throw new PayException("IP信息异常");
+        }
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (subject == null || subject.length() <= 0) {
+            throw new PayException("支付信息头异常");
+        }
+        if (body == null || body.length() <= 0) {
+            throw new PayException("支付信息正文异常");
+        }
+        if (notifyUrl == null || notifyUrl.length() <= 0) {
+            throw new PayException("通知地址异常");
+        }
+        if (requestUrl == null || requestUrl.length() <= 0) {
+            throw new PayException("请求地址异常");
+        }
+
         final WxCreateOrderRequest orderRequest = new WxCreateOrderRequest();
         orderRequest.setBody(subject);
         orderRequest.setDetail(body);
@@ -59,7 +82,9 @@ public class WeChatPay implements IPay {
         orderRequest.setTrade_type("MWEB");
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);
+        payLogCallback.run("h5Pay", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(orderRequest));
         final WxCreateOrderResponse orderInfo = createOrder(orderRequest);
+        payLogCallback.run("h5Pay", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(orderInfo));
         return orderInfo.getMweb_url();
     }
 
@@ -70,6 +95,24 @@ public class WeChatPay implements IPay {
 
     @Override
     public String appPay(String ip, String flowNo, BigDecimal amount, String subject, String body, String notifyUrl, String attachArgs) {
+        if (ip == null || ip.length() <= 0) {
+            throw new PayException("IP信息异常");
+        }
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (subject == null || subject.length() <= 0) {
+            throw new PayException("支付信息头异常");
+        }
+        if (body == null || body.length() <= 0) {
+            throw new PayException("支付信息正文异常");
+        }
+        if (notifyUrl == null || notifyUrl.length() <= 0) {
+            throw new PayException("通知地址异常");
+        }
         final WxCreateOrderRequest orderRequest = new WxCreateOrderRequest();
         orderRequest.setBody(subject);
         orderRequest.setDetail(body);
@@ -79,7 +122,9 @@ public class WeChatPay implements IPay {
         orderRequest.setTrade_type("APP");
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);
+        payLogCallback.run("h5Pay", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(orderRequest));
         final WxCreateOrderResponse orderInfo = createOrder(orderRequest);
+        payLogCallback.run("h5Pay", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(orderInfo));
 
         final WxAPPPayRequest request = new WxAPPPayRequest();
         request.setAppid(weChatPayClient.getAppId());
@@ -94,6 +139,30 @@ public class WeChatPay implements IPay {
     @Override
     public String jsApiPay(String ip, String flowNo, BigDecimal amount, String subject, String body,
                            String requestUrl, String notifyUrl, String attachArgs, String openId) {
+        if (ip == null || ip.length() <= 0) {
+            throw new PayException("IP信息异常");
+        }
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (openId == null || openId.length() <= 0) {
+            throw new PayException("OpenId信息异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (subject == null || subject.length() <= 0) {
+            throw new PayException("支付信息头异常");
+        }
+        if (body == null || body.length() <= 0) {
+            throw new PayException("支付信息正文异常");
+        }
+        if (notifyUrl == null || notifyUrl.length() <= 0) {
+            throw new PayException("通知地址异常");
+        }
+        if (requestUrl == null || requestUrl.length() <= 0) {
+            throw new PayException("请求地址异常");
+        }
         final WxCreateOrderRequest orderRequest = new WxCreateOrderRequest();
         orderRequest.setBody(subject);
         orderRequest.setDetail(body);
@@ -104,7 +173,9 @@ public class WeChatPay implements IPay {
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);
         orderRequest.setOpenid(openId);
+        payLogCallback.run("h5Pay", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(orderRequest));
         final WxCreateOrderResponse orderInfo = createOrder(orderRequest);
+        payLogCallback.run("h5Pay", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(orderInfo));
 
         final WxAPIPayRequest request = new WxAPIPayRequest();
         request.setAppId(weChatPayClient.getAppId());
@@ -118,6 +189,30 @@ public class WeChatPay implements IPay {
     @Override
     public String nativePay(String ip, String flowNo, BigDecimal amount, String subject, String body, String requestUrl,
                             String notifyUrl, String attachArgs, String openId) {
+        if (ip == null || ip.length() <= 0) {
+            throw new PayException("IP信息异常");
+        }
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (openId == null || openId.length() <= 0) {
+            throw new PayException("OpenId信息异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (subject == null || subject.length() <= 0) {
+            throw new PayException("支付信息头异常");
+        }
+        if (body == null || body.length() <= 0) {
+            throw new PayException("支付信息正文异常");
+        }
+        if (notifyUrl == null || notifyUrl.length() <= 0) {
+            throw new PayException("通知地址异常");
+        }
+        if (requestUrl == null || requestUrl.length() <= 0) {
+            throw new PayException("请求地址异常");
+        }
         final WxCreateOrderRequest orderRequest = new WxCreateOrderRequest();
         orderRequest.setBody(subject);
         orderRequest.setDetail(body);
@@ -128,13 +223,40 @@ public class WeChatPay implements IPay {
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);
         orderRequest.setOpenid(openId);
+        payLogCallback.run("nativePay", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(orderRequest));
         final WxCreateOrderResponse orderInfo = createOrder(orderRequest);
+        payLogCallback.run("nativePay", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(orderInfo));
+
         return orderInfo.getCode_url();
     }
 
     @Override
     public String appletsPay(String ip, String flowNo, BigDecimal amount, String subject, String body, String requestUrl,
                              String notifyUrl, String attachArgs, String openId) {
+        if (ip == null || ip.length() <= 0) {
+            throw new PayException("IP信息异常");
+        }
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (openId == null || openId.length() <= 0) {
+            throw new PayException("OpenId信息异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (subject == null || subject.length() <= 0) {
+            throw new PayException("支付信息头异常");
+        }
+        if (body == null || body.length() <= 0) {
+            throw new PayException("支付信息正文异常");
+        }
+        if (notifyUrl == null || notifyUrl.length() <= 0) {
+            throw new PayException("通知地址异常");
+        }
+        if (requestUrl == null || requestUrl.length() <= 0) {
+            throw new PayException("请求地址异常");
+        }
         final WxCreateOrderRequest orderRequest = new WxCreateOrderRequest();
         orderRequest.setBody(subject);
         orderRequest.setDetail(body);
@@ -145,7 +267,10 @@ public class WeChatPay implements IPay {
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);
         orderRequest.setOpenid(openId);
+        payLogCallback.run("appletsPay", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(orderRequest));
         final WxCreateOrderResponse orderInfo = createOrder(orderRequest);
+        payLogCallback.run("appletsPay", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(orderInfo));
+
         final WxAppletsPayRequest wxAppletsPayRequest = new WxAppletsPayRequest();
         wxAppletsPayRequest.setAppId(weChatPayClient.getAppId());
         wxAppletsPayRequest.setTimeStamp(String.valueOf(System.currentTimeMillis()));
@@ -157,12 +282,18 @@ public class WeChatPay implements IPay {
 
     @Override
     public OrderInfo queryOrder(String flowNo) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
         final WxQueryOrderRequest request = new WxQueryOrderRequest();
         request.setAppid(weChatPayClient.getAppId());
         request.setMch_id(weChatPayClient.getMerchantId());
         request.setOut_trade_no(flowNo);
         request.setNonce_str(UUID.randomUUID().toString().replace("-", ""));
+        payLogCallback.run("queryOrder", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
         final WxQueryOrderResponse response = weChatPayClient.execute(QUERY_ORDER, request);
+        payLogCallback.run("queryOrder", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(response));
+
         final OrderInfo orderInfo = new OrderInfo();
         orderInfo.setFlowNo(response.getOut_trade_no());
         orderInfo.setTransactionNo(response.getTransaction_id());
@@ -186,6 +317,12 @@ public class WeChatPay implements IPay {
 
     @Override
     public RefundOrderInfo queryRefundOrderInfo(String flowNo, String refundNo, int offset) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (refundNo == null || refundNo.length() <= 0) {
+            throw new PayException("退款流水号异常");
+        }
         final WxQueryRefundOrderRequest request = new WxQueryRefundOrderRequest();
         request.setAppid(weChatPayClient.getAppId());
         request.setMch_id(weChatPayClient.getMerchantId());
@@ -194,7 +331,11 @@ public class WeChatPay implements IPay {
         request.setOut_refund_no(refundNo);
         request.setOffset(String.valueOf(offset));
 
+        payLogCallback.run("queryRefundOrderInfo", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
         final WxQueryRefundOrderResponse response = weChatPayClient.execute(QUERY_REFUND_ORDER, request);
+        payLogCallback.run("queryRefundOrderInfo", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(response));
+
+
         final RefundOrderInfo refundOrderInfo = new RefundOrderInfo();
         refundOrderInfo.setFlowNo(flowNo);
         refundOrderInfo.setRefundNo(refundNo);
@@ -214,6 +355,21 @@ public class WeChatPay implements IPay {
 
     @Override
     public boolean refundOrder(String flowNo, String refundNo, BigDecimal orderAmount, BigDecimal refundAmount, String refundReason) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (refundNo == null || refundNo.length() <= 0) {
+            throw new PayException("退款流水号异常");
+        }
+        if (orderAmount == null || orderAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("订单金额异常");
+        }
+        if (refundAmount == null || refundAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("退款金额异常");
+        }
+        if (refundReason == null || refundReason.length() <= 0) {
+            throw new PayException("退款原因异常");
+        }
         if (weChatPayClient.getCertificate() == null) {
             throw new PayIOException("退款需要证书: https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=4_3");
         }
@@ -226,23 +382,45 @@ public class WeChatPay implements IPay {
         request.setTotal_fee(String.valueOf(orderAmount.setScale(2, BigDecimal.ROUND_DOWN).multiply(BigDecimal.valueOf(100)).toBigInteger()));
         request.setRefund_fee(String.valueOf(refundAmount.setScale(2, BigDecimal.ROUND_DOWN).multiply(BigDecimal.valueOf(100)).toBigInteger()));
         request.setRefund_desc(refundReason);
+
+        payLogCallback.run("refundOrder", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
         final WxRefundOrderResponse response = weChatPayClient.execute(REFUND_ORDER, request);
+        payLogCallback.run("refundOrder", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(response));
+
         return Objects.equals(response.getResult_code(), "SUCCESS");
     }
 
     @Override
     public boolean closeOrder(String flowNo) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
         final WxCloseOrderRequest request = new WxCloseOrderRequest();
         request.setAppid(weChatPayClient.getAppId());
         request.setMch_id(weChatPayClient.getMerchantId());
         request.setOut_trade_no(flowNo);
         request.setNonce_str(UUID.randomUUID().toString().replace("-", ""));
+        payLogCallback.run("closeOrder", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
         final WxCloseOrderResponse response = weChatPayClient.execute(CLOSE_ORDER, request);
+        payLogCallback.run("closeOrder", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(response));
+
         return Objects.equals(response.getResult_code(), "SUCCESS");
     }
 
     @Override
     public boolean transfer(String flowNo, BigDecimal amount, String payeeId, String realName, String attachArgs) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (payeeId == null || payeeId.length() <= 0) {
+            throw new PayException("收款人信息异常");
+        }
+        if (realName == null || realName.length() <= 0) {
+            throw new PayException("真实姓名信息异常");
+        }
         if (weChatPayClient.getCertificate() == null) {
             throw new PayIOException("转账需要证书: https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=4_3");
         }
@@ -256,12 +434,30 @@ public class WeChatPay implements IPay {
         request.setRe_user_name(realName);
         request.setAmount(String.valueOf(amount.multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_DOWN).toBigInteger()));
         request.setDesc(attachArgs);
+        payLogCallback.run("transfer", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
         final WxTransferOrderResponse response = weChatPayClient.execute(TRANSFERS, request);
+        payLogCallback.run("transfer", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(response));
+
         return Objects.equals(response.getResult_code(), "SUCCESS");
     }
 
     @Override
     public boolean transferBankCard(String flowNo, BigDecimal amount, String bankCardNo, String realName, String bankCode, String attachArgs) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new PayException("金额异常");
+        }
+        if (bankCardNo == null || bankCardNo.length() <= 0) {
+            throw new PayException("卡号信息异常");
+        }
+        if (bankCode == null || bankCode.length() <= 0) {
+            throw new PayException("银行代码信息异常");
+        }
+        if (realName == null || realName.length() <= 0) {
+            throw new PayException("真实姓名信息异常");
+        }
         if (weChatPayClient.getCertificate() == null) {
             throw new PayIOException("转账需要证书: https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=4_3");
         }
@@ -274,12 +470,18 @@ public class WeChatPay implements IPay {
         request.setBank_code(bankCode);
         request.setAmount(String.valueOf(amount.multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_DOWN).toBigInteger()));
         request.setDesc(attachArgs);
+        payLogCallback.run("transferBankCard", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
         final WxTransferBankCardOrderReqsponse response = weChatPayClient.execute(TRANSFERS, request);
+        payLogCallback.run("transferBankCard", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(response));
+
         return Objects.equals(response.getResult_code(), "SUCCESS");
     }
 
     @Override
     public TransferInfo queryTransferInfo(String flowNo) {
+        if (flowNo == null || flowNo.length() <= 0) {
+            throw new PayException("流水号异常");
+        }
         if (weChatPayClient.getCertificate() == null) {
             throw new PayIOException("查询转账需要证书: https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=4_3");
         }
@@ -288,7 +490,10 @@ public class WeChatPay implements IPay {
         request.setMch_id(weChatPayClient.getMerchantId());
         request.setPartner_trade_no(flowNo);
         request.setNonce_str(UUID.randomUUID().toString().replace("-", ""));
+        payLogCallback.run("queryTransferInfo", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(request));
         final WxQueryTransferOrderResponse response = weChatPayClient.execute(QUERY_TRANSFERS, request);
+        payLogCallback.run("queryTransferInfo", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(response));
+
         final TransferInfo transferInfo = new TransferInfo();
         transferInfo.setFlowNo(flowNo);
         transferInfo.setTransactionNo(response.getDetail_id());
