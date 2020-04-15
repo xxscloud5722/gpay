@@ -3,6 +3,9 @@ package com.github.xxscloud5722.gson;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -18,71 +21,104 @@ import java.util.regex.Pattern;
  * @author Cat.
  * Gson JsonObject Rewrite.
  */
+@SuppressWarnings("ALL")
 public final class JsonObject extends HashMap<String, Object> {
     private static final Pattern Z = Pattern.compile("^[-\\+]?[\\d]*$");
+    private static final Type TYPE = new TypeToken<JsonElement>() {
+    }.getType();
 
-    public JsonObject() {
+    private JsonObject() {
 
     }
 
+    @NotNull
+    @Contract(" -> new")
+    public static JsonObject init() {
+        return new JsonObject();
+    }
 
-    public JsonObject(final JsonElement jsonElement) {
+    @NotNull
+    public static JsonObject init(final JsonElement jsonElement) {
+        final JsonObject data = new JsonObject();
         ((com.google.gson.JsonObject) jsonElement).entrySet().forEach(it -> {
             final JsonPrimitive jsonPrimitive = (JsonPrimitive) it.getValue();
+            if (it.getValue() == null) {
+                return;
+            }
             if (jsonPrimitive.isString()) {
-                super.put(it.getKey(), jsonPrimitive.getAsString());
+                data.put(it.getKey(), jsonPrimitive.getAsString());
+                return;
+            }
+            if (jsonPrimitive.isJsonNull()) {
                 return;
             }
             if (jsonPrimitive.isBoolean()) {
-                super.put(it.getKey(), jsonPrimitive.getAsBoolean());
+                data.put(it.getKey(), jsonPrimitive.getAsBoolean());
                 return;
             }
             if (jsonPrimitive.isNumber()) {
-                super.put(it.getKey(), jsonPrimitive.getAsNumber());
+                data.put(it.getKey(), jsonPrimitive.getAsNumber());
                 return;
             }
-            this.put(it.getKey(), it.getValue());
+            data.put(it.getKey(), it.getValue());
         });
+        return data;
     }
 
-    public JsonObject(final Map<Object, Object> map) {
+    @NotNull
+    public static JsonObject init(final Map<Object, Object> map) {
+        final JsonObject data = new JsonObject();
         ((com.google.gson.JsonObject) new Gson().toJsonTree(map)).entrySet().forEach(it -> {
+            if (it.getValue() == null) {
+                return;
+            }
             final JsonPrimitive jsonPrimitive = (JsonPrimitive) it.getValue();
+            if (jsonPrimitive.isJsonNull()) {
+                return;
+            }
             if (jsonPrimitive.isString()) {
-                super.put(it.getKey(), jsonPrimitive.getAsString());
+                data.put(it.getKey(), jsonPrimitive.getAsString());
                 return;
             }
             if (jsonPrimitive.isBoolean()) {
-                super.put(it.getKey(), jsonPrimitive.getAsBoolean());
+                data.put(it.getKey(), jsonPrimitive.getAsBoolean());
                 return;
             }
             if (jsonPrimitive.isNumber()) {
-                super.put(it.getKey(), jsonPrimitive.getAsNumber());
+                data.put(it.getKey(), jsonPrimitive.getAsNumber());
                 return;
             }
-            super.put(it.getKey(), it.getValue());
+            data.put(it.getKey(), it.getValue());
         });
+        return data;
     }
 
-    public JsonObject(final String json) {
-        final Type type = new TypeToken<JsonElement>() {
-        }.getType();
-        ((com.google.gson.JsonObject) JsonUtils.parseObject(json, type)).entrySet().forEach(it -> {
+    @NotNull
+    public static JsonObject init(final String json) {
+        final JsonObject data = new JsonObject();
+        ((com.google.gson.JsonObject) JsonUtils.parseObject(json, TYPE)).entrySet().forEach(it -> {
+            if (it.getValue() == null) {
+                return;
+            }
             final JsonPrimitive jsonPrimitive = (JsonPrimitive) it.getValue();
+            if (jsonPrimitive.isJsonNull()) {
+                return;
+            }
             if (jsonPrimitive.isString()) {
-                super.put(it.getKey(), jsonPrimitive.getAsString());
+                data.put(it.getKey(), jsonPrimitive.getAsString());
                 return;
             }
             if (jsonPrimitive.isBoolean()) {
-                super.put(it.getKey(), jsonPrimitive.getAsBoolean());
+                data.put(it.getKey(), jsonPrimitive.getAsBoolean());
                 return;
             }
             if (jsonPrimitive.isNumber()) {
-                super.put(it.getKey(), jsonPrimitive.getAsNumber());
+                data.put(it.getKey(), jsonPrimitive.getAsNumber());
                 return;
             }
-            super.put(it.getKey(), it.getValue());
+            data.put(it.getKey(), it.getValue());
         });
+        return data;
     }
 
     @Override
@@ -90,41 +126,13 @@ public final class JsonObject extends HashMap<String, Object> {
         return super.get(key);
     }
 
-    //    @Override
-//    public void put(String property, Object value) {
-//        if (value == null) {
-//            return value;
-//        }
-//        if (value instanceof String) {
-//            this.put(property, new JsonPrimitive((String) value));
-//            return value;
-//        }
-//        if (value instanceof Number) {
-//            this.put(property, new JsonPrimitive((Number) value));
-//            return value;
-//        }
-//        if (value instanceof Boolean) {
-//            this.put(property, new JsonPrimitive((Boolean) value));
-//            return value;
-//        }
-//        if (value instanceof Character) {
-//            this.put(property, new JsonPrimitive((Character) value));
-//            return value;
-//        }
-//        if (value instanceof JsonObject) {
-//            this.put(property, new Gson().toJsonTree(new com.google.gson.JsonObject()));
-//            return value;
-//        }
-//        this.put(property, new Gson().toJsonTree(value));
-//        return value;
-//    }
-
     @Override
     public String toString() {
         return JsonUtils.stringify(this);
     }
 
 
+    @Nullable
     public com.github.xxscloud5722.gson.JsonArray getJsonArray(String memberName) {
         final JsonElement element = this.getElement(memberName);
         if (element == null) {
@@ -133,15 +141,17 @@ public final class JsonObject extends HashMap<String, Object> {
         return new JsonArray(element.getAsJsonArray());
     }
 
+    @Nullable
     public JsonObject getJsonObject(String memberName) {
         final JsonElement element = this.getElement(memberName);
         if (element == null) {
             return null;
         }
-        return new JsonObject(element.getAsJsonObject());
+        return JsonObject.init(element.getAsJsonObject());
     }
 
 
+    @Nullable
     public JsonElement getElement(Object key) {
         final Object obj = super.get(key);
         if (obj == null) {
@@ -165,6 +175,7 @@ public final class JsonObject extends HashMap<String, Object> {
         return new Gson().toJsonTree(obj);
     }
 
+    @Nullable
     public Number getNumber(String i) {
         final JsonElement element = this.getElement(i);
         if (element == null) {
@@ -173,6 +184,7 @@ public final class JsonObject extends HashMap<String, Object> {
         return element.getAsNumber();
     }
 
+    @Nullable
     public String getString(String i) {
         final JsonElement element = this.getElement(i);
         if (element == null) {
@@ -181,6 +193,7 @@ public final class JsonObject extends HashMap<String, Object> {
         return element.getAsString();
     }
 
+    @Nullable
     public Double getDouble(String i) {
         final JsonElement element = this.getElement(i);
         if (element == null) {
@@ -189,6 +202,7 @@ public final class JsonObject extends HashMap<String, Object> {
         return element.getAsDouble();
     }
 
+    @Nullable
     public BigDecimal getBigDecimal(String i) {
         final JsonElement element = this.getElement(i);
         if (element == null) {
@@ -197,6 +211,7 @@ public final class JsonObject extends HashMap<String, Object> {
         return element.getAsBigDecimal();
     }
 
+    @Nullable
     public BigInteger getBigInteger(String i) {
         final JsonElement element = this.getElement(i);
         if (element == null) {
@@ -205,6 +220,7 @@ public final class JsonObject extends HashMap<String, Object> {
         return element.getAsBigInteger();
     }
 
+    @NotNull
     public Float getFloat(String i) {
         final JsonElement element = this.getElement(i);
         if (element == null) {
@@ -213,6 +229,7 @@ public final class JsonObject extends HashMap<String, Object> {
         return element.getAsFloat();
     }
 
+    @Nullable
     public Long getLong(String i) {
         final JsonElement element = this.getElement(i);
         if (element == null) {
@@ -221,6 +238,7 @@ public final class JsonObject extends HashMap<String, Object> {
         return element.getAsLong();
     }
 
+    @Nullable
     public Integer getInteger(String i) {
         final JsonElement element = this.getElement(i);
         if (element == null) {
@@ -253,6 +271,7 @@ public final class JsonObject extends HashMap<String, Object> {
         return element.getAsShort();
     }
 
+    @Nullable
     public Boolean getBoolean(String i) {
         final JsonElement element = this.getElement(i);
         if (element == null) {
@@ -261,6 +280,7 @@ public final class JsonObject extends HashMap<String, Object> {
         return element.getAsBoolean();
     }
 
+    @Nullable
     public Date getDate(String i) {
         final JsonElement element = this.getElement(i);
         if (element == null) {
@@ -285,6 +305,7 @@ public final class JsonObject extends HashMap<String, Object> {
         }
     }
 
+    @Nullable
     public Date getDate(String i, String format) {
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
         final JsonElement element = this.getElement(i);

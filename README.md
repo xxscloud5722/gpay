@@ -17,6 +17,29 @@ final Object weChatPayClient =  new WeChatPayClient("wxa95794c4caf294fc", "15556
 
 // 传入对应的渠道初始化IPay
 final IPay pay = GPayFactory.getPay(PayChannelEnum.WE_CHAT, weChatPayClient);
+
+//微信回执参数颜值
+String xml = "<xml><appid><![CDATA[wx0bab1e29fbcd1b87]]></appid>\n" +
+                "<attach><![CDATA[179_sulAEFior1]]></attach>\n" +
+                "<bank_type><![CDATA[CMB_DEBIT]]></bank_type>\n" +
+                "<cash_fee><![CDATA[14172]]></cash_fee>\n" +
+                "<fee_type><![CDATA[CNY]]></fee_type>\n" +
+                "<is_subscribe><![CDATA[N]]></is_subscribe>\n" +
+                "<mch_id><![CDATA[1555631301]]></mch_id>\n" +
+                "<nonce_str><![CDATA[102d5db9424a465ea1457cef98fd4ac5]]></nonce_str>\n" +
+                "<openid><![CDATA[o96vBw9fl-olflRB1y_UvgdkSJQM]]></openid>\n" +
+                "<out_trade_no><![CDATA[su3O2yyJ0Y]]></out_trade_no>\n" +
+                "<result_code><![CDATA[SUCCESS]]></result_code>\n" +
+                "<return_code><![CDATA[SUCCESS]]></return_code>\n" +
+                "<sign><![CDATA[7353DE197F953E9367D1AB3AA134E2F4]]></sign>\n" +
+                "<time_end><![CDATA[20200331122539]]></time_end>\n" +
+                "<total_fee>14172</total_fee>\n" +
+                "<trade_type><![CDATA[APP]]></trade_type>\n" +
+                "<transaction_id><![CDATA[4200000473202003315764102113]]></transaction_id>\n" +
+                "</xml>";
+Signature.callbackCheck(PayChannelEnum.WE_CHAT_PAY, weChatPayClient, xml, null, o -> {
+    System.out.println(JsonUtils.stringify(o));
+});
 ```
 
 ### 支付宝
@@ -52,6 +75,13 @@ certAlipayRequest.setRootCertPath("/Users/xxscloud/code/xxscloud/com.pay.java/al
 
 // 传入对应的渠道初始化IPay
 final IPay pay = GPayFactory.getPay(PayChannelEnum.ALIPAY, weChatPayClient);
+
+// 参数验证
+body = 获取 获取当前支付宝POST表单提交过来的 参数的Map 转Json
+String body = "{\"gmt_create\":\"2020-04-10 14:37:26\",\"charset\":\"UTF-8\",\"seller_email\":\"3432215688@qq.com\",\"subject\":\"测试\",\"sign\":\"DcLH4xrtHVfgG/yCiUIL+zy34oYEpDu3AaIBrL6sO5A3BNYSlt73OhDtXlW9o5z14YAE3l1qnia2uhNGtWqElxU8vN1qCsNIbyH9H0u9jlf8EJt6xZb6eVJ3YLooC/ff8+WaScIHP/kbvz6A+o0B/F7NInni8Atisw4nFQ5mDjN/pBDdeYnEXWCX3EfD012G2EH9YcbuKhxtdyqz1ymvgqQ6xpgw8gltdQM13vQXwejrGofRZcIMIM7VhOxskvgZ7q8qWV5tlqtWneAMwuKeuI1Cet7L/Bsqu+GTC9VF1PYSzPxARq2Jwdf7UJ7mvb/t+PdNq4zK5w2+qiUSOxHwUA==\",\"body\":\"测试商品\",\"buyer_id\":\"2088512795384321\",\"invoice_amount\":\"0.01\",\"notify_id\":\"2020041000222143727084321412499469\",\"fund_bill_list\":\"[{\\\"amount\\\":\\\"0.01\\\",\\\"fundChannel\\\":\\\"PCREDIT\\\"}]\",\"notify_type\":\"trade_status_sync\",\"trade_status\":\"TRADE_SUCCESS\",\"receipt_amount\":\"0.01\",\"buyer_pay_amount\":\"0.01\",\"app_id\":\"2021001113639731\",\"sign_type\":\"RSA2\",\"seller_id\":\"2088631353531343\",\"gmt_payment\":\"2020-04-10 14:37:26\",\"notify_time\":\"2020-04-10 14:37:27\",\"version\":\"1.0\",\"out_trade_no\":\"TEST222222212312\",\"total_amount\":\"0.01\",\"trade_no\":\"2020041022001484321441793982\",\"auth_app_id\":\"2021001113639731\",\"buyer_logon_id\":\"156***@163.com\",\"point_amount\":\"0.00\"}";
+Signature.callbackCheck(PayChannelEnum.ALI_PAY, certAlipayRequest, body, o -> {
+    System.out.println(JsonUtils.stringify(o));
+});
 ```
 
 

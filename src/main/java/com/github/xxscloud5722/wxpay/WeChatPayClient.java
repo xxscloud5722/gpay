@@ -210,7 +210,7 @@ public class WeChatPayClient {
         try {
             final Document document = DocumentHelper.parseText(xml);
             final Element root = document.getRootElement();
-            final JsonObject obj = new JsonObject();
+            final JsonObject obj = JsonObject.init();
             final Iterator it = root.elementIterator();
             while (it.hasNext()) {
                 Element element = (Element) it.next();

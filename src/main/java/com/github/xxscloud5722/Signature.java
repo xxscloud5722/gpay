@@ -66,7 +66,7 @@ public final class Signature {
         final OrderInfo orderInfo;
         switch (channel) {
             case ALI_PAY:
-                final JsonObject aliPayObject = new JsonObject(body);
+                final JsonObject aliPayObject = JsonObject.init(body);
                 orderInfo = new OrderInfo();
                 orderInfo.setFlowNo(aliPayObject.getString("out_trade_no"));
                 orderInfo.setTransactionNo(aliPayObject.getString("trade_no"));

@@ -472,7 +472,7 @@ public class AliPay implements IPay {
     @Override
     public boolean checkSignature(HashMap<String, String> header, String body) {
         final TreeMap<String, String> treeMap = new TreeMap<>();
-        final JsonObject data = new JsonObject(body);
+        final JsonObject data = JsonObject.init(body);
         data.forEach((k, v) -> {
             if (!Objects.equals(k, "sign") && !Objects.equals(k, "sign_type")) {
                 treeMap.put(k, v.toString());
