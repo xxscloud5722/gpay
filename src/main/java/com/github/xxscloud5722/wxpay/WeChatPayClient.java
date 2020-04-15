@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
@@ -32,9 +34,9 @@ import java.util.Objects;
 
 @Slf4j
 public class WeChatPayClient {
-    private String appId;
-    private String merchantId;
-    private String key;
+    private final String appId;
+    private final String merchantId;
+    private final String key;
     private byte[] certificate;
     private final HttpClient httpClient;
 
@@ -43,7 +45,18 @@ public class WeChatPayClient {
         this.appId = appId;
         this.merchantId = merchantId;
         this.key = key;
-        httpClient = HttpClientBuilder.create().build();
+
+        final PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
+        manager.setMaxTotal(300);
+        manager.setDefaultMaxPerRoute(50);
+        final RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(60000)
+                .setConnectionRequestTimeout(1000)
+                .setSocketTimeout(60000).build();
+        httpClient = HttpClientBuilder.create()
+                .setDefaultRequestConfig(requestConfig)
+                .setConnectionManager(manager)
+                .build();
     }
 
     public WeChatPayClient(String appId, String merchantId, String key, byte[] certificate) {
@@ -53,10 +66,21 @@ public class WeChatPayClient {
         this.certificate = certificate;
 
         try {
+            final PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
+            manager.setMaxTotal(300);
+            manager.setDefaultMaxPerRoute(50);
+            final RequestConfig requestConfig = RequestConfig.custom()
+                    .setConnectTimeout(60000)
+                    .setConnectionRequestTimeout(1000)
+                    .setSocketTimeout(60000).build();
+
             final KeyStore keyStore = KeyStore.getInstance("PKCS12");
             keyStore.load(new ByteArrayInputStream(certificate), merchantId.toCharArray());
             final SSLContext sslcontext = SSLContexts.custom().loadKeyMaterial(keyStore, merchantId.toCharArray()).build();
-            httpClient = HttpClientBuilder.create().setSSLContext(sslcontext).build();
+            httpClient = HttpClientBuilder.create()
+                    .setDefaultRequestConfig(requestConfig)
+                    .setConnectionManager(manager)
+                    .setSSLContext(sslcontext).build();
         } catch (Exception e) {
             throw new PayIOException("证书错误, " + e.getMessage());
         }
