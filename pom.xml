@@ -4,24 +4,126 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+
     <groupId>com.github.xxscloud5722</groupId>
     <artifactId>gpay</artifactId>
-    <version>1.0</version>
+    <version>1.5</version>
+    <packaging>jar</packaging>
+    <name>Gpay</name>
+    <description>
+        GPay AliPay WeChatPay
+    </description>
+    <url>
+        https://github.com/xxscloud5722/gpay
+    </url>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo,manual</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Zhao Yun</name>
+            <email>zhaoyun@gmail.com</email>
+            <organization>zhaoyun</organization>
+            <url>https://github.com/xxscloud5722/</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/xxscloud5722/gpay</connection>
+        <developerConnection>scm:git:https://github.com/xxscloud5722/gpay</developerConnection>
+        <url>https://github.com/xxscloud5722/gpay</url>
+        <tag>1.2.0</tag>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <name>OSS Snapshots Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <name>OSS Staging Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
+
     <build>
         <plugins>
+            <!-- Source -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>ossrh</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--Compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <fork>true</fork>
+                    <verbose>true</verbose>
+                    <encoding>UTF-8</encoding>
+                    <showWarnings>false</showWarnings>
                 </configuration>
+            </plugin>
+            <!--Release -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.1</version>
             </plugin>
         </plugins>
     </build>
@@ -42,7 +144,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.10</version>
-         </dependency>
+        </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -85,11 +187,11 @@
         </dependency>
 
         <!-- 微信支付SDK -->
-<!--        <dependency>-->
-<!--            <groupId>com.alipay.sdk</groupId>-->
-<!--            <artifactId>alipay-sdk-java</artifactId>-->
-<!--            <version>4.9.100.ALL</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.alipay.sdk</groupId>-->
+        <!--            <artifactId>alipay-sdk-java</artifactId>-->
+        <!--            <version>4.9.100.ALL</version>-->
+        <!--        </dependency>-->
     </dependencies>
 
     <repositories>
@@ -102,16 +204,4 @@
             <url>https://repo.rdc.aliyun.com/repository/73562-snapshot-Ml4niL/</url>
         </repository>
     </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>rdc-releases</id>
-            <url>https://repo.rdc.aliyun.com/repository/73562-release-lmXjO7/</url>
-        </repository>
-        <snapshotRepository>
-            <id>rdc-snapshots</id>
-            <url>https://repo.rdc.aliyun.com/repository/73562-snapshot-Ml4niL/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
 </project>

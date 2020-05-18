@@ -66,9 +66,6 @@ public class WeChatPay implements IPay {
         if (body == null || body.length() <= 0) {
             throw new PayException("支付信息正文异常");
         }
-        if (notifyUrl == null || notifyUrl.length() <= 0) {
-            throw new PayException("通知地址异常");
-        }
         if (requestUrl == null || requestUrl.length() <= 0) {
             throw new PayException("请求地址异常");
         }
@@ -78,7 +75,7 @@ public class WeChatPay implements IPay {
         orderRequest.setDetail(body);
         orderRequest.setOut_trade_no(flowNo);
         orderRequest.setTotal_fee(amount.setScale(2, BigDecimal.ROUND_DOWN).multiply(BigDecimal.valueOf(100)).toBigInteger());
-        orderRequest.setNotify_url(notifyUrl);
+        orderRequest.setNotify_url(requestUrl);
         orderRequest.setTrade_type("MWEB");
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);
@@ -94,7 +91,7 @@ public class WeChatPay implements IPay {
     }
 
     @Override
-    public String appPay(String ip, String flowNo, BigDecimal amount, String subject, String body, String notifyUrl, String attachArgs) {
+    public String appPay(String ip, String flowNo, BigDecimal amount, String subject, String body, String requestUrl, String attachArgs) {
         if (ip == null || ip.length() <= 0) {
             throw new PayException("IP信息异常");
         }
@@ -110,7 +107,7 @@ public class WeChatPay implements IPay {
         if (body == null || body.length() <= 0) {
             throw new PayException("支付信息正文异常");
         }
-        if (notifyUrl == null || notifyUrl.length() <= 0) {
+        if (requestUrl == null || requestUrl.length() <= 0) {
             throw new PayException("通知地址异常");
         }
         final WxCreateOrderRequest orderRequest = new WxCreateOrderRequest();
@@ -118,7 +115,7 @@ public class WeChatPay implements IPay {
         orderRequest.setDetail(body);
         orderRequest.setOut_trade_no(flowNo);
         orderRequest.setTotal_fee(amount.setScale(2, BigDecimal.ROUND_DOWN).multiply(BigDecimal.valueOf(100)).toBigInteger());
-        orderRequest.setNotify_url(notifyUrl);
+        orderRequest.setNotify_url(requestUrl);
         orderRequest.setTrade_type("APP");
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);
@@ -157,9 +154,6 @@ public class WeChatPay implements IPay {
         if (body == null || body.length() <= 0) {
             throw new PayException("支付信息正文异常");
         }
-        if (notifyUrl == null || notifyUrl.length() <= 0) {
-            throw new PayException("通知地址异常");
-        }
         if (requestUrl == null || requestUrl.length() <= 0) {
             throw new PayException("请求地址异常");
         }
@@ -168,7 +162,7 @@ public class WeChatPay implements IPay {
         orderRequest.setDetail(body);
         orderRequest.setOut_trade_no(flowNo);
         orderRequest.setTotal_fee(amount.setScale(2, BigDecimal.ROUND_DOWN).multiply(BigDecimal.valueOf(100)).toBigInteger());
-        orderRequest.setNotify_url(notifyUrl);
+        orderRequest.setNotify_url(requestUrl);
         orderRequest.setTrade_type("JSAPI");
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);
@@ -179,7 +173,7 @@ public class WeChatPay implements IPay {
 
         final WxAPIPayRequest request = new WxAPIPayRequest();
         request.setAppId(weChatPayClient.getAppId());
-        request.setTimeStamp(String.valueOf(System.currentTimeMillis()));
+        request.setTimeStamp(String.valueOf(System.currentTimeMillis() / 1000));
         request.setNonceStr(UUID.randomUUID().toString().replace("-", ""));
         request.setPackages("prepay_id=" + orderInfo.getPrepay_id());
         request.setSignType("MD5");
@@ -207,9 +201,6 @@ public class WeChatPay implements IPay {
         if (body == null || body.length() <= 0) {
             throw new PayException("支付信息正文异常");
         }
-        if (notifyUrl == null || notifyUrl.length() <= 0) {
-            throw new PayException("通知地址异常");
-        }
         if (requestUrl == null || requestUrl.length() <= 0) {
             throw new PayException("请求地址异常");
         }
@@ -218,7 +209,7 @@ public class WeChatPay implements IPay {
         orderRequest.setDetail(body);
         orderRequest.setOut_trade_no(flowNo);
         orderRequest.setTotal_fee(amount.setScale(2, BigDecimal.ROUND_DOWN).multiply(BigDecimal.valueOf(100)).toBigInteger());
-        orderRequest.setNotify_url(notifyUrl);
+        orderRequest.setNotify_url(requestUrl);
         orderRequest.setTrade_type("NATIVE");
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);
@@ -251,9 +242,6 @@ public class WeChatPay implements IPay {
         if (body == null || body.length() <= 0) {
             throw new PayException("支付信息正文异常");
         }
-        if (notifyUrl == null || notifyUrl.length() <= 0) {
-            throw new PayException("通知地址异常");
-        }
         if (requestUrl == null || requestUrl.length() <= 0) {
             throw new PayException("请求地址异常");
         }
@@ -262,7 +250,7 @@ public class WeChatPay implements IPay {
         orderRequest.setDetail(body);
         orderRequest.setOut_trade_no(flowNo);
         orderRequest.setTotal_fee(amount.setScale(2, BigDecimal.ROUND_DOWN).multiply(BigDecimal.valueOf(100)).toBigInteger());
-        orderRequest.setNotify_url(notifyUrl);
+        orderRequest.setNotify_url(requestUrl);
         orderRequest.setTrade_type("JSAPI");
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 
 /**
- * @author  Cat.
+ * @author Cat.
  */
 public interface IPay {
 
@@ -52,12 +52,12 @@ public interface IPay {
      * @param amount     金额.
      * @param subject    标题.
      * @param body       内容(选填) 空字符串.
-     * @param notifyUrl  通知地址.
+     * @param requestUrl 通知地址.
      * @param attachArgs 附加参数 (选填) 空字符串.
      * @return 字符串.
      */
     String appPay(String ip, String flowNo, BigDecimal amount, String subject, String body,
-                  String notifyUrl, String attachArgs);
+                  String requestUrl, String attachArgs);
 
     /**
      * JS 支付.

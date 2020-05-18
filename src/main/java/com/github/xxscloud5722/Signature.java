@@ -23,17 +23,16 @@ public final class Signature {
      * 回调函数检查.
      *
      * @param channel  渠道代码.
-     * @param obj      客户端组件.
+     * @param pay      客户端组件.
      * @param body     请求过来的消息body String.
      * @param header   请求过来的消息头.
      * @param callback 回执函数  如果执行失败抛出PayIOException异常会默认通知第三方失败.
      * @return 需要返回给第三方的字符串.
      */
-    public static String callbackCheck(PayChannelEnum channel, Object obj, String body, HashMap<String, String> header,
+    public static String callbackCheck(PayChannelEnum channel, IPay pay, String body, HashMap<String, String> header,
                                        SignatureCallback callback) {
 
         try {
-            final IPay pay = GPayFactory.getPay(channel, obj);
             if (!pay.checkSignature(header, body)) {
                 throw new PayIOException("签名错误");
             }
@@ -50,15 +49,15 @@ public final class Signature {
      * 回调函数检查.
      *
      * @param channel  渠道代码.
-     * @param obj      客户端组件.
+     * @param pay      客户端组件.
      * @param body     请求过来的消息body String.
      * @param callback 回执函数  如果执行失败抛出PayIOException异常会默认通知第三方失败.
      * @return 需要返回给第三方的字符串.
      */
-    public static String callbackCheck(PayChannelEnum channel, Object obj, String body,
+    public static String callbackCheck(PayChannelEnum channel, IPay pay, String body,
                                        SignatureCallback callback) {
 
-        return callbackCheck(channel, obj, body, null, callback);
+        return callbackCheck(channel, pay, body, null, callback);
     }
 
     @SneakyThrows

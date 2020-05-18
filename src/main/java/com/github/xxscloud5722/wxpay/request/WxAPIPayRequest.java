@@ -7,6 +7,7 @@ import com.github.xxscloud5722.PayException;
 import lombok.Data;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.TreeMap;
 
 @Data
@@ -23,10 +24,11 @@ public class WxAPIPayRequest implements IWxRequest {
     public String toString() {
         final StringBuilder content = new StringBuilder();
         toMap().forEach((k, v) -> {
-            if (k.contains("sign") || v == null) {
+            if (!Objects.equals("signType", k) && (k.contains("sign") || v == null || v.toString().length() <= 0)) {
                 return;
             }
-            content.append(k).append("=").append(v).append("&");
+            final String nk = Objects.equals(k, "packages") ? "package" : k;
+            content.append(nk).append("=").append(v).append("&");
         });
         if (content.length() > 0) {
             content.delete(content.length() - 1, content.length());

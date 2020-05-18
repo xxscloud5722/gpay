@@ -7,6 +7,7 @@ import com.github.xxscloud5722.wxpay.response.WxTransferBankCardOrderReqsponse;
 import lombok.Data;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.TreeMap;
 
 @Data
@@ -26,7 +27,7 @@ public class WxTransferBankCardOrderRequest implements IWxRequest {
     public String toString() {
         final StringBuilder content = new StringBuilder();
         toMap().forEach((k, v) -> {
-            if (k.contains("sign") || v == null) {
+            if (!Objects.equals("signType", k) && (k.contains("sign") || v == null || v.toString().length() <= 0)) {
                 return;
             }
             content.append(k).append("=").append(v).append("&");
