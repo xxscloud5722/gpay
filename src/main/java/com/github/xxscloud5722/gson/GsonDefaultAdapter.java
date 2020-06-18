@@ -1,10 +1,7 @@
 package com.github.xxscloud5722.gson;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
+import com.alibaba.fastjson.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -13,10 +10,6 @@ import java.util.List;
  * @author Cat.
  */
 public final class GsonDefaultAdapter implements JsonTarget {
-    private static Gson GSON = new GsonBuilder()
-            .setDateFormat("yyyy-MM-dd HH:mm:ss")
-            .disableHtmlEscaping()
-            .create();
 
 
     @Override
@@ -24,7 +17,7 @@ public final class GsonDefaultAdapter implements JsonTarget {
         if (json == null || type == null) {
             return null;
         }
-        return GSON.fromJson(json, type);
+        return JSONObject.parseObject(json, type);
     }
 
     @Override
@@ -32,24 +25,33 @@ public final class GsonDefaultAdapter implements JsonTarget {
         if (json == null || type == null) {
             return null;
         }
-        return GSON.fromJson(json, type);
+        return JSONObject.parseObject(json, type);
     }
+
 
     @Override
     public JsonObject parseObject(final String json) {
         if (json == null) {
             return null;
         }
-        return GSON.fromJson(json, new TypeToken<JsonElement>() {
-        }.getType());
+        return JSONObject.parseObject(json, JsonObject.class);
     }
 
     @Override
+    @SuppressWarnings("ALL")
     public <T> List<T> parseArrayObject(final String json, final Type type) {
         if (json == null || type == null) {
             return null;
         }
-        return GSON.fromJson(json, type);
+        return (List<T>) JSONObject.parseArray(json, new Type[]{type});
+    }
+
+    @Override
+    public <T> List<T> parseArrayObject(final String json, final Class<T> type) {
+        if (json == null || type == null) {
+            return null;
+        }
+        return JSONObject.parseArray(json, type);
     }
 
     @Override
@@ -57,8 +59,7 @@ public final class GsonDefaultAdapter implements JsonTarget {
         if (json == null) {
             return null;
         }
-        return (JsonArray) GSON.fromJson(json, new TypeToken<JsonElement>() {
-        }.getType());
+        return (JsonArray) JSONObject.parseArray(json);
     }
 
     @Override
@@ -66,7 +67,7 @@ public final class GsonDefaultAdapter implements JsonTarget {
         if (obj == null) {
             return null;
         }
-        return GSON.toJson(obj);
+        return JSONObject.toJSONString(obj);
     }
 
 

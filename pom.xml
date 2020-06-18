@@ -135,11 +135,11 @@
             <artifactId>alipay-sdk-java</artifactId>
             <version>4.9.100.ALL</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.6</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.google.code.gson</groupId>-->
+<!--            <artifactId>gson</artifactId>-->
+<!--            <version>2.8.6</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -186,12 +186,11 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- 微信支付SDK -->
-        <!--        <dependency>-->
-        <!--            <groupId>com.alipay.sdk</groupId>-->
-        <!--            <artifactId>alipay-sdk-java</artifactId>-->
-        <!--            <version>4.9.100.ALL</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.68</version>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -204,4 +203,5 @@
             <url>https://repo.rdc.aliyun.com/repository/73562-snapshot-Ml4niL/</url>
         </repository>
     </repositories>
+
 </project>

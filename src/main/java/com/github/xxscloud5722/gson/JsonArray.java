@@ -1,213 +1,52 @@
 package com.github.xxscloud5722.gson;
 
 
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
+import com.alibaba.fastjson.JSONArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Type;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.RandomAccess;
 
 
 /**
  * @author Cat.
  * Gson JsonArray Rewrite.
  */
-public final class JsonArray extends ArrayList<JsonElement> {
+public final class JsonArray extends JSONArray implements List<Object>, Cloneable, RandomAccess, Serializable {
     public JsonArray() {
     }
 
-    public JsonArray(final String json) {
-        final Type type = new TypeToken<JsonElement>() {
-        }.getType();
-        ((com.google.gson.JsonArray) JsonUtils.parseObject(json, type)).forEach(this::add);
+
+    @NotNull
+    public static JsonArray init() {
+        return new JsonArray();
     }
 
-    public JsonArray(@NotNull final JsonElement jsonArray) {
-        jsonArray.getAsJsonArray().forEach(this::add);
-    }
 
+    @NotNull
+    public static JsonArray init(final String json) {
+        return JsonUtils.parseArrayObject(json);
+    }
 
     @Nullable
     public JsonObject getJsonObject(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return JsonObject.init(element.getAsJsonObject());
+        return (JsonObject) super.getJSONObject(i);
     }
 
     @Nullable
     public JsonArray getJsonArray(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return new JsonArray(element.getAsJsonArray());
-    }
-
-    @Nullable
-    public Number getNumber(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return element.getAsNumber();
-    }
-
-    @Nullable
-    public String getString(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return element.getAsString();
-    }
-
-    @Nullable
-    public Double getDouble(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return element.getAsDouble();
-    }
-
-    @Nullable
-    public BigDecimal getBigDecimal(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return element.getAsBigDecimal();
-    }
-
-    @Nullable
-    public BigInteger getBigInteger(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return element.getAsBigInteger();
-    }
-
-    @Nullable
-    public Float getFloat(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return element.getAsFloat();
-    }
-
-    @Nullable
-    public Long getLong(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return element.getAsLong();
-    }
-
-    @Nullable
-    public Integer getInteger(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return element.getAsInt();
-    }
-
-    public byte getByte(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            throw new NullPointerException();
-        }
-        if (element.isJsonNull()) {
-            throw new NullPointerException();
-        }
-        return element.getAsByte();
-    }
-
-    public char getCharacter(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            throw new NullPointerException();
-        }
-        if (element.isJsonNull()) {
-            throw new NullPointerException();
-        }
-        return element.getAsCharacter();
-    }
-
-    public short getShort(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            throw new NullPointerException();
-        }
-        if (element.isJsonNull()) {
-            throw new NullPointerException();
-        }
-        return element.getAsShort();
-    }
-
-    @Nullable
-    public Boolean getBoolean(int i) {
-        final JsonElement element = this.get(i);
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonNull()) {
-            return null;
-        }
-        return element.getAsBoolean();
+        return (JsonArray) super.getJSONArray(i);
     }
 
 
     @Nullable
     public JsonObject getJsonObject() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                return null;
-            }
-            if (element.isJsonNull()) {
-                return null;
-            }
-            return JsonObject.init(element.getAsJsonObject());
+            return (JsonObject) super.getJSONObject(0);
         } else {
             throw new IllegalStateException();
         }
@@ -216,14 +55,7 @@ public final class JsonArray extends ArrayList<JsonElement> {
     @Nullable
     public Number getNumber() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                return null;
-            }
-            if (element.isJsonNull()) {
-                return null;
-            }
-            return element.getAsNumber();
+            return super.getDouble(0);
         } else {
             throw new IllegalStateException();
         }
@@ -232,14 +64,7 @@ public final class JsonArray extends ArrayList<JsonElement> {
     @Nullable
     public String getString() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                return null;
-            }
-            if (element.isJsonNull()) {
-                return null;
-            }
-            return element.getAsString();
+            return super.getString(0);
         } else {
             throw new IllegalStateException();
         }
@@ -248,14 +73,7 @@ public final class JsonArray extends ArrayList<JsonElement> {
     @Nullable
     public Double getDouble() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                return null;
-            }
-            if (element.isJsonNull()) {
-                return null;
-            }
-            return element.getAsDouble();
+            return super.getDouble(0);
         } else {
             throw new IllegalStateException();
         }
@@ -264,14 +82,7 @@ public final class JsonArray extends ArrayList<JsonElement> {
     @Nullable
     public BigDecimal getBigDecimal() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                return null;
-            }
-            if (element.isJsonNull()) {
-                return null;
-            }
-            return element.getAsBigDecimal();
+            return super.getBigDecimal(0);
         } else {
             throw new IllegalStateException();
         }
@@ -280,14 +91,7 @@ public final class JsonArray extends ArrayList<JsonElement> {
     @Nullable
     public BigInteger getBigInteger() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                return null;
-            }
-            if (element.isJsonNull()) {
-                return null;
-            }
-            return element.getAsBigInteger();
+            return super.getBigInteger(0);
         } else {
             throw new IllegalStateException();
         }
@@ -296,14 +100,7 @@ public final class JsonArray extends ArrayList<JsonElement> {
     @Nullable
     public Float getFloat() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                return null;
-            }
-            if (element.isJsonNull()) {
-                return null;
-            }
-            return element.getAsFloat();
+            return super.getFloat(0);
         } else {
             throw new IllegalStateException();
         }
@@ -312,14 +109,7 @@ public final class JsonArray extends ArrayList<JsonElement> {
     @Nullable
     public Long getLong() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                return null;
-            }
-            if (element.isJsonNull()) {
-                return null;
-            }
-            return element.getAsLong();
+            return super.getLong(0);
         } else {
             throw new IllegalStateException();
         }
@@ -328,14 +118,7 @@ public final class JsonArray extends ArrayList<JsonElement> {
     @Nullable
     public Integer getInteger() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                return null;
-            }
-            if (element.isJsonNull()) {
-                return null;
-            }
-            return element.getAsInt();
+            return super.getInteger(0);
         } else {
             throw new IllegalStateException();
         }
@@ -343,60 +126,24 @@ public final class JsonArray extends ArrayList<JsonElement> {
 
     public byte getByte() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                throw new NullPointerException();
-            }
-            if (element.isJsonNull()) {
-                throw new NullPointerException();
-            }
-            return element.getAsByte();
+            return super.getByte(0);
         } else {
             throw new IllegalStateException();
         }
     }
 
-    public char getCharacter() {
+
+    public Short getShort() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                throw new NullPointerException();
-            }
-            if (element.isJsonNull()) {
-                throw new NullPointerException();
-            }
-            return element.getAsCharacter();
+            return super.getShort(0);
         } else {
             throw new IllegalStateException();
         }
     }
 
-    public short getShort() {
+    public boolean getBoolean() {
         if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                throw new NullPointerException();
-            }
-            if (element.isJsonNull()) {
-                throw new NullPointerException();
-            }
-            return element.getAsShort();
-        } else {
-            throw new IllegalStateException();
-        }
-    }
-
-    @Nullable
-    public Boolean getBoolean() {
-        if (this.size() == 1) {
-            final JsonElement element = this.get(0);
-            if (element == null) {
-                return null;
-            }
-            if (element.isJsonNull()) {
-                return null;
-            }
-            return element.getAsBoolean();
+            return super.getBooleanValue(0);
         } else {
             throw new IllegalStateException();
         }
