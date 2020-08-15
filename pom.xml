@@ -7,7 +7,7 @@
 
     <groupId>com.github.xxscloud5722</groupId>
     <artifactId>gpay</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <packaging>jar</packaging>
     <name>Gpay</name>
     <description>

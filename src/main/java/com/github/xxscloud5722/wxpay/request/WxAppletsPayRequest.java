@@ -28,7 +28,8 @@ public class WxAppletsPayRequest implements IWxRequest {
             if (!Objects.equals("signType", k) && (k.contains("sign") || v == null || v.toString().length() <= 0)) {
                 return;
             }
-            content.append(k).append("=").append(v).append("&");
+            final String nk = Objects.equals(k, "packages") ? "package" : k;
+            content.append(nk).append("=").append(v).append("&");
         });
         if (content.length() > 0) {
             content.delete(content.length() - 1, content.length());

@@ -230,9 +230,6 @@ public class WeChatPay implements IPay {
         if (flowNo == null || flowNo.length() <= 0) {
             throw new PayException("流水号异常");
         }
-        if (openId == null || openId.length() <= 0) {
-            throw new PayException("OpenId信息异常");
-        }
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new PayException("金额异常");
         }
@@ -254,7 +251,6 @@ public class WeChatPay implements IPay {
         orderRequest.setTrade_type("JSAPI");
         orderRequest.setAttach(attachArgs);
         orderRequest.setSpbill_create_ip(ip);
-        orderRequest.setOpenid(openId);
         payLogCallback.run("appletsPay", flowNo, LogTypeEnum.REQUEST, JsonUtils.stringify(orderRequest));
         final WxCreateOrderResponse orderInfo = createOrder(orderRequest);
         payLogCallback.run("appletsPay", flowNo, LogTypeEnum.RESPONSE, JsonUtils.stringify(orderInfo));
