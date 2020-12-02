@@ -283,3 +283,10 @@ public interface IPay {
 }
 
 ```
+
+
+
+# 打赏
+
+![image](https://github.com/xxscloud5722/gpay/blob/master/WechatIMG415.jpeg)
+![image](https://github.com/xxscloud5722/gpay/blob/master/WechatIMG416.jpeg)
